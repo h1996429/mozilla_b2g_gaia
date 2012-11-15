@@ -23,6 +23,9 @@ and talk to us on IRC:
 See INSTALL file in B2G repository for instructions on building and running B2G. To try out Gaia on desktop, see
 
   https://wiki.mozilla.org/Gaia/Hacking
+## github commands
+git checkout blah blah blah
+
 
 ## Tests
 
