@@ -12,9 +12,7 @@ function padLeft(num, length) {
 }
 
 
-// This handles the logic pertaining to the naming of files according
-// to the Design rule for Camera File System
-// * http://en.wikipedia.org/wiki/Design_rule_for_Camera_File_system
+
 var DCFApi = (function() {
 
   var api = {};
