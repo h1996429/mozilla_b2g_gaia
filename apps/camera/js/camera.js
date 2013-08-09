@@ -36,8 +36,7 @@ var DCFApi = (function() {
       dcfConfigLoaded = true;
       dcfConfig.seq = value ? value : defaultSeq;
 
-      // We have a previous call to createDCFFilename that is waiting for
-      // a response, fire it again
+
       if (deferredArgs) {
         var args = deferredArgs;
         api.createDCFFilename(args.storage, args.type, args.callback);
@@ -48,8 +47,7 @@ var DCFApi = (function() {
 
   api.createDCFFilename = function(storage, type, callback) {
 
-    // We havent loaded the current counters from indexedDB yet, defer
-    // the call
+
     if (!dcfConfigLoaded) {
       deferredArgs = {storage: storage, type: type, callback: callback};
       return;
@@ -60,13 +58,10 @@ var DCFApi = (function() {
       padLeft(dcfConfig.seq.file, 4) + '.' +
       dcfConfig.ext[type];
 
-    // A file with this name may have been written by the user or
-    // our indexeddb sequence tracker was cleared, check we wont overwrite
-    // anything
+
     var req = storage.get(filepath + filename);
 
-    // A file existed, we bump the directory then try to generate a
-    // new filename
+
     req.onsuccess = function() {
       dcfConfig.seq.file = 1;
       dcfConfig.seq.dir += 1;
@@ -75,7 +70,7 @@ var DCFApi = (function() {
       });
     };
 
-    // No file existed, we are good to go
+
     req.onerror = function() {
       if (dcfConfig.seq.file < 9999) {
         dcfConfig.seq.file += 1;
@@ -101,7 +96,7 @@ var Camera = {
   _captureMode: null,
   _recording: false,
 
-  // In secure mode the user cannot browse to the gallery
+
   _secureMode: window.parent !== window,
   _currentOverlay: null,
 
@@ -110,8 +105,8 @@ var Camera = {
 
   _videoTimer: null,
   _videoStart: null,
-  _videoPath: null, // file path relative to video root directory
-  _videoRootDir: null, // video root directory string
+  _videoPath: null, 
+  _videoRootDir: null, 
 
   _autoFocusSupported: 0,
   _manuallyFocused: false,
@@ -179,13 +174,13 @@ var Camera = {
   _pendingPick: null,
   _savedBlob: null,
 
-  // The minimum available disk space to start recording a video.
+
   RECORD_SPACE_MIN: 1024 * 1024 * 2,
 
-  // Number of bytes left on disk to let us stop recording.
+
   RECORD_SPACE_PADDING: 1024 * 1024 * 1,
 
-  // Maximum image resolution for still photos taken with camera
+
   MAX_IMAGE_RES: 1600 * 1200, // Just under 2 megapixels
 
   get overlayTitle() {
@@ -244,10 +239,7 @@ var Camera = {
     return document.getElementById('select-button');
   },
 
-  // We have seperated init and delayedInit as we want to make sure
-  // that on first launch we dont interfere and load the camera
-  // previewStream as fast as possible, once the previewStream is
-  // active we do the rest of the initialisation.
+
   init: function() {
     var self = this;
     this.setCaptureMode(this.CAMERA);
@@ -273,17 +265,14 @@ var Camera = {
   },
 
   delayedInit: function camera_delayedInit() {
-    // If we don't have any pending messages, show the usual UI
-    // Otherwise, determine which buttons to show once we get our
-    // activity message
+
     if (!navigator.mozHasPendingMessage('activity')) {
       this.galleryButton.classList.remove('hidden');
       this.switchButton.classList.remove('hidden');
       this.enableButtons();
     }
 
-    // Dont let the phone go to sleep while the camera is
-    // active, user must manually close it
+
     this.screenWakeLock();
     this.setToggleCameraStyle();
 
@@ -411,16 +400,15 @@ var Camera = {
     }
   },
 
-  // When inside an activity the user cannot switch between
-  // the gallery or video recording.
+
   initPick: function camera_initPick(activity) {
     this._pendingPick = activity;
 
-    // Hide the gallery and switch buttons, leaving only the shutter
+
     this.galleryButton.classList.add('hidden');
     this.switchButton.classList.add('hidden');
 
-    // Display the cancel button, and make sure it's enabled
+
     this.cancelPickButton.classList.remove('hidden');
     this.cancelPickButton.removeAttribute('disabled');
   },
@@ -516,12 +504,11 @@ var Camera = {
       this._recording = true;
       this.startRecordingTimer();
 
-      // Hide the filmstrip to prevent the users from
-      // entering the preview mode after Camera starts recording
+
       if (Filmstrip.isShown())
         Filmstrip.hide();
 
-      // User closed app while recording was trying to start
+
       if (document.mozHidden) {
         this.stopRecording();
       }
@@ -555,10 +542,6 @@ var Camera = {
                              (function(path, name) {
       this._videoPath = path + name;
 
-      // The CameraControl API will not automatically create directories
-      // for the new file if they do not exist, so write a dummy file
-      // to the same directory via DeviceStorage to ensure that the directory
-      // exists before recording starts.
       var dummyblob = new Blob([''], {type: 'video/3gpp'});
       var dummyfilename = path + '.' + name;
       var req = this._videoStorage.addNamed(dummyblob, dummyfilename);
@@ -569,8 +552,8 @@ var Camera = {
         var rootDirLength = absolutePath.length - dummyfilename.length;
         this._videoRootDir = absolutePath.substring(0, rootDirLength);
 
-        this._videoStorage.delete(dummyfilename); // No need to wait for success
-        // Determine the number of bytes available on disk.
+        this._videoStorage.delete(dummyfilename); 
+
         var spaceReq = this._videoStorage.freeSpace();
         spaceReq.onerror = onerror;
         spaceReq.onsuccess = function() {
@@ -642,9 +625,7 @@ var Camera = {
   },
 
   galleryBtnPressed: function camera_galleryBtnPressed() {
-    // Can't launch the gallery if the lockscreen is locked.
-    // The button shouldn't even be visible in this case, but
-    // let's be really sure here.
+
     if (this._secureMode)
       return;
 
